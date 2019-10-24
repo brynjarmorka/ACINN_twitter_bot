@@ -23,7 +23,6 @@ def get_weather_data(station):
 
     return df
 
-
 def get_climate_data(station):
     '''Here we aggregate climate information to get monthly extreme values.
     TODO: find better base data, this is only hourly from 1986-2012
@@ -48,8 +47,9 @@ def get_climate_data(station):
 
 if __name__ == '__main__':
     # TESTING:
-    # weather = get_weather_data('innsbruck')
+    weather = get_weather_data('innsbruck')
     climate = get_climate_data('innsbruck')
+    print(weather)
     print(climate)
 
 
