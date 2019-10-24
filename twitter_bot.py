@@ -7,6 +7,7 @@ import time
 import sched
 import pandas as pd
 import sys
+import datetime
 try:
     from configparser import ConfigParser
 except ImportError:
@@ -52,12 +53,18 @@ def detect_anomaly(weather, climate):
     TODO: actually implement the logic!
     '''
     message = ''
-    month = time.now().month()
+    month = datetime.datetime.now().month
     m = month - 1  # month index
+    today_max = weather.resample('D').max().iloc[-1, :]
+    today_min = weather.resample('D').min().iloc[-1, :]
+    today_sum = weather.resample('D').sum().iloc[-1, :]
+    print(today_sum)
+    sys.exit()
     for var in climate.keys():
         # TODO: run the logic: first aggregate the last day, then check if
         # some threshold is exceeded.
         # Example message: 
+        
         message += ('Todays maximum temperature of '
                     + '{:.1f}'.format(weather.iloc[-1, :['tl']]) 
                     + '°C was the highest recorded for this station!')
@@ -79,6 +86,11 @@ def main(config, climate):
 if __name__ == '__main__':
     climate = get_climate_data('innsbruck')
     config = get_config()
+    main(config, climate)
+
+    sys.exit()
+    # NOTE: the following schedules the script to run every day at 21:00 Vienna
+    # time.
     scheduler = sched.scheduler(time.time, time.sleep)
     # Now we create a list of timestamps and schedule an execution of main()
     # every evening:
