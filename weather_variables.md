@@ -1,4 +1,8 @@
-# The weather df from the station have the following variabels
+# The weather df from the station have the following variables
+
+check out https://acinn-data.uibk.ac.at/innsbruck/1
+
+column 'time' is added in get_weather_data in get_data.py
 
 - rr
   - rain? [mm?]
