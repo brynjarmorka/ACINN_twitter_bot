@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from datetime import datetime, timedelta
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
@@ -44,7 +43,8 @@ def get_climate_data(station):
     TODO: compare the loaded data to monthly climate data for Innsbruck
     TODO: if there are deviations over a threshold, we return the interesting data with metadata
     """
-    ...
+    # PLACEHOLDER: just to have a working function
+    return get_weather_data(station)
 
 
 # TODO: delete old get_climate_data, kept temporary to see old structure
