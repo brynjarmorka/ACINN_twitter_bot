@@ -37,14 +37,42 @@ def get_weather_data(station):
 
 def get_climate_data(station):
     """
-    Clever doc
+    Computes monthly climate stats 
 
-    TODO: read inn climate data from innsbruck (we need a file)
-    TODO: compare the loaded data to monthly climate data for Innsbruck
-    TODO: if there are deviations over a threshold, we return the interesting data with metadata
+    Parameters:
+    ----------
+    station : string
+        Name of the location of the station in study
+
+    --------
+    returns: pandas dataframe
+        monthly climate stats ( ----to be added-----) from the location
     """
-    # PLACEHOLDER: just to have a working function
-    return get_weather_data(station)
+    # read file
+    df = pd.read_csv('./sample_data_20000101_20101231.csv')
+    
+    # some formatting
+    df.index = pd.to_datetime(df['time'], format='%Y-%m-%d')
+    
+    # select location
+    if station == 'innsbruck':
+        stat_id = 11803.0
+    if station == 'other_station':
+        stati_id = 666
+    else:
+        print('station not implemented')
+        
+    df[df['station'] == stat_id]
+
+    # compute some stats
+    climate = pd.DataFrame(None, columns = ['mean', 'p95', 'p05'])
+    climate['mean'] = df.groupby(by=[df.index.month]).mean().t
+    climate['p95'] = df.groupby(by=[df.index.month]).quantile(0.95).t
+    climate['p05'] = df.groupby(by=[df.index.month]).quantile(0.05).t
+    #df.groupby(by=[df.index.month]).max()
+    #df.groupby(by=[df.index.month]).min()
+
+    return climate
 
 
 # TODO: delete old get_climate_data, kept temporary to see old structure

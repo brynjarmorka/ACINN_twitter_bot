@@ -7,6 +7,7 @@ import sys
 import os.path
 from configparser import ConfigParser
 from get_data import get_weather_data, get_climate_data
+import pandas as pd
 
 
 def update_twitter(config, message):
@@ -74,7 +75,7 @@ def detect_anomaly(weather, climate):
         The data from the local weather station in a dataframe. 24h data
         Check out weather_variables.md to see its variables.
     climate : pandas DataFrome
-        The local climate based on a static file. From the past _____ years.
+        The local monthly climate based on a static file. From the past _____ years.
 
     Returns
     -------
