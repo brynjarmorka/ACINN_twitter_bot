@@ -7,7 +7,6 @@ import sys
 import os.path
 from configparser import ConfigParser
 from get_data import get_weather_data, get_climate_data
-import pandas as pd
 
 
 def update_twitter(config, message):
@@ -83,35 +82,43 @@ def detect_anomaly(weather, climate):
         The message to be posted on twitter. If it's None, no tweet should be posted.
 
     """
-    # # # # # The old code:
-    """
-    message = ""
-    month = datetime.datetime.now().month
-    m = month - 1  # month index
-    today_max = weather.resample("D").max().iloc[-1, :]
-    today_min = weather.resample("D").min().iloc[-1, :]
-    today_sum = weather.resample("D").sum().iloc[-1, :]
-    print(today_sum)
-    sys.exit()
-    for var in climate.keys():
-        # TODO: run the logic: first aggregate the last day, then check if
-        # some threshold is exceeded.
-        # Example message:
-        message += (
-            "Todays maximum temperature of "
-            + "{:.1f}".format(weather.iloc[-1, :["tl"]])
-            + "°C was the highest recorded for this station!"
+
+    # Getting the average T for the past day
+    weather_stats = {
+        "mean": weather["tl"].mean(),
+        "max": weather["tl"].max(),
+        "min": weather["tl"].min(),
+        # TODO: handle NaN-values in 'tl', which are set to -99.9
+    }
+
+    # compare to df climate with ["mean", "p95", "p05"] and months as index [1,2, .. 12]
+    this_month = weather["time"][0].month
+    months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ]
+
+    # if weather_stats["max"] >= climate["p95"][this_month]:
+    if weather_stats["max"] >= climate["p95"][this_month]:
+        message = (
+            f"The maximum temperature the past day in Innsbruck at {weather_stats['max']}°C is in the 95% quantile"
+            f" for {months[this_month]}."
         )
+        return message
+
+    # if there are no interesting data, return None
     else:
-        message = None
-    return message
-    """
-    # placeholder code:
-    if climate["rr"][0] == weather["rr"][0]:
-        message = "climate and weather variable are equal"
-    else:
-        message = "climate and weather is"
-    return message
+        return None
 
 
 def main():

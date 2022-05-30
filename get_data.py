@@ -37,7 +37,7 @@ def get_weather_data(station):
 
 def get_climate_data(station):
     """
-    Computes monthly climate stats 
+    Computes monthly climate stats
 
     Parameters:
     ----------
@@ -49,53 +49,37 @@ def get_climate_data(station):
         monthly climate stats ( ----to be added-----) from the location
     """
     # read file
-    df = pd.read_csv('./sample_data_20000101_20101231.csv')
-    
+    df = pd.read_csv("./sample_data_20000101_20101231.csv")
+
     # some formatting
-    df.index = pd.to_datetime(df['time'], format='%Y-%m-%d')
-    
+    df.index = pd.to_datetime(df["time"], format="%Y-%m-%d")
+    print(station)
+    stat_id = 11803.0
     # select location
-    if station == 'innsbruck':
-        stat_id = 11803.0
-    if station == 'other_station':
-        stati_id = 666
-    else:
-        print('station not implemented')
-        
-    df[df['station'] == stat_id]
+    # if station == "innsbruck":
+    #     stat_id = 11803.0
+    # if station == "other_station":
+    #     stati_id = 666
+    # else:
+    #     print("station not implemented")
+    #     return None  # Must be terminated
+
+    df[df["station"] == stat_id]
 
     # compute some stats
-    climate = pd.DataFrame(None, columns = ['mean', 'p95', 'p05'])
-    climate['mean'] = df.groupby(by=[df.index.month]).mean().t
-    climate['p95'] = df.groupby(by=[df.index.month]).quantile(0.95).t
-    climate['p05'] = df.groupby(by=[df.index.month]).quantile(0.05).t
-    #df.groupby(by=[df.index.month]).max()
-    #df.groupby(by=[df.index.month]).min()
+    climate = pd.DataFrame(None, columns=["mean", "p95", "p05"])
+    climate["mean"] = df.groupby(by=[df.index.month]).mean().t
+    climate["p95"] = df.groupby(by=[df.index.month]).quantile(0.95).t
+    climate["p05"] = df.groupby(by=[df.index.month]).quantile(0.05).t
+    #
+    # # Warning: FutureWarning: Dropping invalid columns in DataFrameGroupBy.quantile is deprecated. In a future
+    # # version, a TypeError will be raised. Before calling .quantile, select only columns which should be valid for
+    # # the function: climate["p95"] = df.groupby(by=[df.index.month]).quantile(0.95).t
+    #
+    # df.groupby(by=[df.index.month]).max()
+    # df.groupby(by=[df.index.month]).min()
 
     return climate
-
-
-# TODO: delete old get_climate_data, kept temporary to see old structure
-# def get_climate_data(station):
-#     '''Here we aggregate climate information to get monthly extreme values.
-#     TODO: find better base data, this is only hourly from 1986-2012
-#     '''
-#     filename = station + '_weather_data1980_2012.csv'
-#     df = pd.read_csv(filename, skiprows=1, header='infer', delimiter=';')
-#     df['time'] = pd.to_datetime(df['rawdate'])
-#     df = df.set_index('time')
-#
-#     out = {}
-#     # Now that we have the climate data, we need to find monthly extreme
-#     # values:
-#     out['tl_max'] = df['ttx'].groupby(df.index.month).max().values
-#     out['tl_min'] = df['ttx'].groupby(df.index.month).min().values
-#     out['ff_max'] = df['vex'].groupby(df.index.month).max().values
-#     out['td_max'] = df['tfx'].groupby(df.index.month).max().values
-#     out['td_min'] = df['tfx'].groupby(df.index.month).max().values
-#     out['rr_max'] = df['rsx'].groupby(df.index.month).max().values
-#
-#     return out
 
 
 if __name__ == "__main__":
