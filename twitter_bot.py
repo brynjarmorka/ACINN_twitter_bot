@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 This is the main part of the twitter bot.
 """
@@ -8,9 +9,10 @@ import os.path
 from configparser import ConfigParser
 from get_data import get_weather_data, get_climate_data
 import pandas as pd
+import datetime
 
 
-def update_twitter(config, message):
+def update_twitter(config, message):    
     """This actually updates twitter, if the config.ini have the valid keys.
 
     Parameters
@@ -19,13 +21,26 @@ def update_twitter(config, message):
         Dictionary with api-keys and access token to post to Twitter
     message : string
         String to be tweeted, here just printed to the console
-    """
-    # Authenticate to Twitter
-    auth = tweepy.OAuthHandler(config["api_key"], config["api_secret_key"])
-    auth.set_access_token(config["access_token"], config["access_token_secret"])
+    """   
+    # Authentificate
+    client = tweepy.Client(
+       consumer_key=config['api_key'], consumer_secret=config['api_secret_key'],
+       access_token=config['access_token'], access_token_secret=config['access_token_secret']
+       )
 
-    api = tweepy.API(auth)  # Create API object
-    api.update_status(message)  # Create a tweet
+    # Create Tweet
+
+    # The app and the corresponding credentials must have the Write permission
+
+    # Check the App permissions section of the Settings tab of your app, under the
+    # Twitter Developer Portal Projects & Apps page at
+    # https://developer.twitter.com/en/portal/projects-and-apps
+
+    # Make sure to reauthorize your app / regenerate your access token and secret 
+    # after setting the Write permission
+
+    response = client.create_tweet(text=message)
+    print(f'https://twitter.com/user/status/{response.data["id"]}')
 
 
 def dummy_update_twitter(config, message):
@@ -38,7 +53,7 @@ def dummy_update_twitter(config, message):
     message : string
         String to be tweeted, here just printed to the console
     """
-    print(f"This would have been tweeted: \n{message}\n\nThis is the config:\n{config}")
+    #print(f"This would have been tweeted: \n{message}\n\nThis is the config:\n{config}")
 
 
 def get_config():
@@ -107,10 +122,13 @@ def detect_anomaly(weather, climate):
     return message
     """
     # placeholder code:
-    if climate["rr"][0] == weather["rr"][0]:
-        message = "climate and weather variable are equal"
-    else:
-        message = "climate and weather is"
+    month = datetime.datetime.now().month
+    
+    w = weather["tp"].mean()
+    c = climate["mean"][month]
+    dif = round(w - c, 1) 
+    w = round(w,3)
+    message = f"Todays mean temperature until now is {w} deg. and differs from monthly climate values by {dif} deg."
     return message
 
 
@@ -124,7 +142,7 @@ def main():
 
     if message is not None:
         # TODO: remove the dummy_ for actually posting to Twitter:
-        dummy_update_twitter(config, message)
+        update_twitter(config, message)
 
 
 if __name__ == "__main__":
@@ -133,11 +151,12 @@ if __name__ == "__main__":
 
     sys.exit()
 
+    # --> Migrated to crontab    
     # # # # # # Below is old code for a scheduled run
     #
     # # NOTE: the following schedules the script to run every day at 21:00 Vienna
     # # time.
-    # scheduler = sched.scheduler(time.time, time.sleep)
+    #scheduler = sched.scheduler(time.time, time.sleep)
     # # Now we create a list of timestamps and schedule an execution of main()
     # # every evening:
     # date_range = (
@@ -151,3 +170,4 @@ if __name__ == "__main__":
     # for date in timestamps:
     #     scheduler.enterabs(date, 1, main, (config, climate))
     # scheduler.run()
+    
