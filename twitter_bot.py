@@ -53,7 +53,7 @@ def dummy_update_twitter(config, message):
     message : string
         String to be tweeted, here just printed to the console
     """
-    #print(f"This would have been tweeted: \n{message}\n\nThis is the config:\n{config}")
+    print(f"This would have been tweeted: \n{message}\n\nThis is the config:\n{config}")
 
 
 def get_config():
@@ -123,14 +123,17 @@ def detect_anomaly(weather, climate):
     """
     # placeholder code:
     month = datetime.datetime.now().month
+    time = str(datetime.datetime.now().hour) +':'+ str(datetime.datetime.now().minute)
     
-    w = weather["tp"].mean()
+    w = weather["tl"].mean()
     c = climate["mean"][month]
     dif = round(w - c, 1) 
-    w = round(w,3)
-    message = f"Todays mean temperature until now is {w} deg. and differs from monthly climate values by {dif} deg."
+    
+    if dif > 0:
+        dif = '+' + str(dif)
+    w = round(w, 1)
+    message = f"Last 24h mean temperature ({time}) is {w} deg. and differs from monthly climate values by {dif} deg."
     return message
-
 
 def main():
     """Runs weather and climate comparison, makes a message and post to twitter."""
