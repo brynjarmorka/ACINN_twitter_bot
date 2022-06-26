@@ -11,7 +11,7 @@ def get_weather_data(station="innsbruck"):
     Loads data from the past 24 hours, with some lag (around 3 hours)
     This function was written by Brynjar in the climvis project, winter 2021. Modified
     """
-    interval = "1"  # The data we load inn is the past 1 day
+    interval = "1"  # The data we load inn is the past 1 day. Can be 1, 3 or 7
     if station == "innsbruck":
         print("selected station is innsbruck")
     elif station == "other_station":

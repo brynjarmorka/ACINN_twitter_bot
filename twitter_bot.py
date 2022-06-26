@@ -8,7 +8,6 @@ import sys
 import os.path
 from configparser import ConfigParser
 from get_data import get_weather_data, get_climate_data
-import pandas as pd
 import datetime
 
 
@@ -94,29 +93,7 @@ def detect_anomaly(weather, climate):
     message : string or None
         The message to be posted on twitter. If it's None, no tweet should be posted.
     """
-    # # # # # The old code:
-    """
-    message = ""
-    month = datetime.datetime.now().month
-    m = month - 1  # month index
-    today_max = weather.resample("D").max().iloc[-1, :]
-    today_min = weather.resample("D").min().iloc[-1, :]
-    today_sum = weather.resample("D").sum().iloc[-1, :]
-    print(today_sum)
-    sys.exit()
-    for var in climate.keys():
-        # TODO: run the logic: first aggregate the last day, then check if
-        # some threshold is exceeded.
-        # Example message:
-        message += (
-            "Todays maximum temperature of "
-            + "{:.1f}".format(weather.iloc[-1, :["tl"]])
-            + "°C was the highest recorded for this station!"
-        )
-    else:
-        message = None
-    return message
-    """
+
     # placeholder code:
     month = datetime.datetime.now().month
     time = str(datetime.datetime.now().hour) + ":" + str(datetime.datetime.now().minute)
@@ -150,23 +127,3 @@ if __name__ == "__main__":
     main()
 
     sys.exit()
-
-    # --> Migrated to crontab
-    # # # # # # Below is old code for a scheduled run
-    #
-    # # NOTE: the following schedules the script to run every day at 21:00 Vienna
-    # # time.
-    # scheduler = sched.scheduler(time.time, time.sleep)
-    # # Now we create a list of timestamps and schedule an execution of main()
-    # # every evening:
-    # date_range = (
-    #     pd.date_range(
-    #         pd.to_datetime("2019-10-24 21:00"), periods=10000, tz="Europe/Vienna"
-    #     )
-    #     .to_pydatetime()
-    #     .tolist()
-    # )
-    # timestamps = [d.timestamp() for d in date_range]
-    # for date in timestamps:
-    #     scheduler.enterabs(date, 1, main, (config, climate))
-    # scheduler.run()
