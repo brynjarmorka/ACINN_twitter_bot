@@ -9,6 +9,7 @@ import os.path
 from configparser import ConfigParser
 from get_data import get_weather_data, get_climate_data
 import datetime
+from pathlib import Path
 
 
 def update_twitter(config, message):
@@ -55,26 +56,30 @@ def dummy_update_twitter(config, message):
     print(f"This would have been tweeted: \n{message}\n\nThis is the config:\n{config}")
 
 
-def get_config():
-    """Read config from config.ini. User must have config.ini in the same dir as twitter_bot.py.
-    Exits the script if there is no config.ini
+def get_api_key():
+    """Read API-key / access token file named ".twitter_bot_API.ini" which should be in your HOME dir.
+    Exits the script if there is no file
     Returns
     ----------
     config : dict
         Dictionary with api-keys and access token to post to Twitter
     """
-    # I think this works, not sure if it is good practice.
-    # It will terminate the script completely.
-    if not os.path.exists("./config.ini"):
-        print("FileNotFoundError: config.ini must be the same dir as twitter_bot.py")
+
+    # Accessing the hidden file in the HOME dir of the user:
+    api_key_path = Path("~/.twitter_bot_API.ini")
+    full_path = os.path.expanduser(api_key_path)
+    if not os.path.exists(full_path):
+        print(
+            f"FileNotFoundError: '.twitter_bot_API.ini' must be your HOME dir, {full_path}"
+        )
         sys.exit()
     else:
         ini = ConfigParser()
-        ini.read("config.ini")
-        config = {}
+        ini.read(full_path)
+        api_key_dict = {}
         for key in ["api_key", "api_secret_key", "access_token", "access_token_secret"]:
-            config[key] = ini.get("twitter_credentials", key)
-        return config
+            api_key_dict[key] = ini.get("twitter_credentials", key)
+        return api_key_dict
 
 
 def detect_anomaly(weather, climate):
@@ -112,7 +117,7 @@ def detect_anomaly(weather, climate):
 def main():
     """Runs weather and climate comparison, makes a message and post to twitter."""
     station = "innsbruck"  # could also support "ellboegen", "obergurgl", "sattelberg", if we get climate data there.
-    config = get_config()
+    config = get_api_key()
     climate = get_climate_data(station)
     weather = get_weather_data(station)
     message = detect_anomaly(weather, climate)
