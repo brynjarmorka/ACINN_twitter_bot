@@ -32,7 +32,6 @@ def get_weather_data(station="innsbruck"):
     df["time"] = [
         datetime(1970, 1, 1) + timedelta(milliseconds=ds) for ds in df["datumsec"]
     ]
-
     # Check if the df is empty.
     if df.isnull().values.any():
         sys.exit(
@@ -45,39 +44,21 @@ def get_weather_data(station="innsbruck"):
 def get_climate_data(station="innsbruck"):
     """
     Computes monthly climate stats
-
     Parameters:
     ----------
     station : string
         Name of the location of the station in study. Default: innsbruck
-
     --------
     returns: pandas dataframe
         monthly climate stats ( ----to be added-----) from the location
     """
     # read file
-    df = pd.read_csv("./sample_data_20000101_20101231.csv")
-
-    # some formatting
-    df.index = pd.to_datetime(df["time"], format="%Y-%m-%d")
-
-    # select location
-    if station == "innsbruck":
-        stat_id = 11803.0
-    elif station == "other_station":
-        stat_id = 666
-    else:
-        raise ValueError(f"station {station} not implemented")
-
-    df[df["station"] == stat_id]
-
+    df = pd.read_parquet("df_ibk.parquet.gzip")
     # compute some stats
     climate = pd.DataFrame(None, columns=["mean", "p95", "p05"])
     climate["mean"] = df.groupby(by=[df.index.month]).mean().t
     climate["p95"] = df.groupby(by=[df.index.month]).quantile(0.95).t
     climate["p05"] = df.groupby(by=[df.index.month]).quantile(0.05).t
-    # df.groupby(by=[df.index.month]).max()
-    # df.groupby(by=[df.index.month]).min()
 
     return climate
 
