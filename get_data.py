@@ -5,13 +5,20 @@ from urllib.error import HTTPError
 import sys
 
 
-def get_weather_data(station):
+def get_weather_data(station="innsbruck"):
     """
     Some clever documentation.
     Loads data from the past 24 hours, with some lag (around 3 hours)
     This function was written by Brynjar in the climvis project, winter 2021. Modified
     """
     interval = "1"  # The data we load inn is the past 1 day
+    if station == "innsbruck":
+        print("selected station is innsbruck")
+    elif station == "other_station":
+        Warning("Warning: Station is not innsbruck")
+    else:
+        raise ValueError("station not implemented")
+
     url = f"https://acinn-data.uibk.ac.at/{station}/{interval}"
     # Parse the given url
     try:
@@ -35,14 +42,14 @@ def get_weather_data(station):
     return df
 
 
-def get_climate_data(station):
+def get_climate_data(station="innsbruck"):
     """
     Computes monthly climate stats
 
     Parameters:
     ----------
     station : string
-        Name of the location of the station in study
+        Name of the location of the station in study. Default: innsbruck
 
     --------
     returns: pandas dataframe
@@ -53,16 +60,14 @@ def get_climate_data(station):
 
     # some formatting
     df.index = pd.to_datetime(df["time"], format="%Y-%m-%d")
-    print(station)
-    stat_id = 11803.0
+
     # select location
-    # if station == "innsbruck":
-    #     stat_id = 11803.0
-    # if station == "other_station":
-    #     stati_id = 666
-    # else:
-    #     print("station not implemented")
-    #     return None  # Must be terminated
+    if station == "innsbruck":
+        stat_id = 11803.0
+    elif station == "other_station":
+        stat_id = 666
+    else:
+        raise ValueError(f"station {station} not implemented")
 
     df[df["station"] == stat_id]
 
@@ -71,11 +76,6 @@ def get_climate_data(station):
     climate["mean"] = df.groupby(by=[df.index.month]).mean().t
     climate["p95"] = df.groupby(by=[df.index.month]).quantile(0.95).t
     climate["p05"] = df.groupby(by=[df.index.month]).quantile(0.05).t
-    #
-    # # Warning: FutureWarning: Dropping invalid columns in DataFrameGroupBy.quantile is deprecated. In a future
-    # # version, a TypeError will be raised. Before calling .quantile, select only columns which should be valid for
-    # # the function: climate["p95"] = df.groupby(by=[df.index.month]).quantile(0.95).t
-    #
     # df.groupby(by=[df.index.month]).max()
     # df.groupby(by=[df.index.month]).min()
 

@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 This is the main part of the twitter bot.
 """
@@ -7,11 +8,12 @@ import sys
 import os.path
 from configparser import ConfigParser
 from get_data import get_weather_data, get_climate_data
+import pandas as pd
+import datetime
 
 
 def update_twitter(config, message):
     """This actually updates twitter, if the config.ini have the valid keys.
-
     Parameters
     ----------
     config : dict
@@ -19,17 +21,31 @@ def update_twitter(config, message):
     message : string
         String to be tweeted, here just printed to the console
     """
-    # Authenticate to Twitter
-    auth = tweepy.OAuthHandler(config["api_key"], config["api_secret_key"])
-    auth.set_access_token(config["access_token"], config["access_token_secret"])
+    # Authentificate
+    client = tweepy.Client(
+        consumer_key=config["api_key"],
+        consumer_secret=config["api_secret_key"],
+        access_token=config["access_token"],
+        access_token_secret=config["access_token_secret"],
+    )
 
-    api = tweepy.API(auth)  # Create API object
-    api.update_status(message)  # Create a tweet
+    # Create Tweet
+
+    # The app and the corresponding credentials must have the Write permission
+
+    # Check the App permissions section of the Settings tab of your app, under the
+    # Twitter Developer Portal Projects & Apps page at
+    # https://developer.twitter.com/en/portal/projects-and-apps
+
+    # Make sure to reauthorize your app / regenerate your access token and secret
+    # after setting the Write permission
+
+    response = client.create_tweet(text=message)
+    print(f'https://twitter.com/user/status/{response.data["id"]}')
 
 
 def dummy_update_twitter(config, message):
     """Prints to the console the generated message. Also prints the config.
-
     Parameters
     ----------
     config : dict
@@ -43,7 +59,6 @@ def dummy_update_twitter(config, message):
 def get_config():
     """Read config from config.ini. User must have config.ini in the same dir as twitter_bot.py.
     Exits the script if there is no config.ini
-
     Returns
     ----------
     config : dict
@@ -67,7 +82,6 @@ def detect_anomaly(weather, climate):
     """
     Compares weather to the climate and makes a message.
     If it cannot find any interesting data, it will return None.
-
     Parameters
     ----------
     weather : pandas DataFrame
@@ -75,50 +89,47 @@ def detect_anomaly(weather, climate):
         Check out weather_variables.md to see its variables.
     climate : pandas DataFrome
         The local monthly climate based on a static file. From the past _____ years.
-
     Returns
     -------
     message : string or None
         The message to be posted on twitter. If it's None, no tweet should be posted.
-
     """
-
-    # Getting the average T for the past day
-    weather_stats = {
-        "mean": weather["tl"].mean(),
-        "max": weather["tl"].max(),
-        "min": weather["tl"].min(),
-        # TODO: handle NaN-values in 'tl', which are set to -99.9
-    }
-
-    # compare to df climate with ["mean", "p95", "p05"] and months as index [1,2, .. 12]
-    this_month = weather["time"][0].month
-    months = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-    ]
-
-    # if weather_stats["max"] >= climate["p95"][this_month]:
-    if weather_stats["max"] >= climate["p95"][this_month]:
-        message = (
-            f"The maximum temperature the past day in Innsbruck at {weather_stats['max']}°C is in the 95% quantile"
-            f" for {months[this_month]}."
+    # # # # # The old code:
+    """
+    message = ""
+    month = datetime.datetime.now().month
+    m = month - 1  # month index
+    today_max = weather.resample("D").max().iloc[-1, :]
+    today_min = weather.resample("D").min().iloc[-1, :]
+    today_sum = weather.resample("D").sum().iloc[-1, :]
+    print(today_sum)
+    sys.exit()
+    for var in climate.keys():
+        # TODO: run the logic: first aggregate the last day, then check if
+        # some threshold is exceeded.
+        # Example message:
+        message += (
+            "Todays maximum temperature of "
+            + "{:.1f}".format(weather.iloc[-1, :["tl"]])
+            + "°C was the highest recorded for this station!"
         )
-        return message
-
-    # if there are no interesting data, return None
     else:
-        return None
+        message = None
+    return message
+    """
+    # placeholder code:
+    month = datetime.datetime.now().month
+    time = str(datetime.datetime.now().hour) + ":" + str(datetime.datetime.now().minute)
+
+    w = weather["tl"].mean()
+    c = climate["mean"][month]
+    dif = round(w - c, 1)
+
+    if dif > 0:
+        dif = "+" + str(dif)
+    w = round(w, 1)
+    message = f"Last 24h mean temperature ({time}) is {w} deg. and differs from monthly climate values by {dif} deg."
+    return message
 
 
 def main():
@@ -131,7 +142,7 @@ def main():
 
     if message is not None:
         # TODO: remove the dummy_ for actually posting to Twitter:
-        dummy_update_twitter(config, message)
+        update_twitter(config, message)
 
 
 if __name__ == "__main__":
@@ -140,6 +151,7 @@ if __name__ == "__main__":
 
     sys.exit()
 
+    # --> Migrated to crontab
     # # # # # # Below is old code for a scheduled run
     #
     # # NOTE: the following schedules the script to run every day at 21:00 Vienna
