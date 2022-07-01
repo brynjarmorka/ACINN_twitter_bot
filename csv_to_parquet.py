@@ -11,7 +11,7 @@ def get_climate_data(station="innsbruck"):
 
     OBS: You need wither 'pyarrow' or 'fastparqued' to run this one.
     """
-    df = pd.read_csv("./sample_data_20000101_20101231.csv")
+    df = pd.read_csv("./2mtemp_19900101_20200101.csv")
     # some formatting
     df.index = pd.to_datetime(df["time"], format="%Y-%m-%d")
     # select location

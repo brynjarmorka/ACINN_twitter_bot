@@ -167,10 +167,10 @@ def text_generator(totweet):
         
     # check precipitation
     # add ppt message
-    if totweet['Precipitaiton'] is not None and message is not None:
+    if totweet['Precipitation'] is not None and message is not None:
         message = message + f'\n \U0001F4A7 And and a considerable precipitation accumulation of {totweet["Precipitation"]}mm \U0001F4A7'
     # create ppt message
-    if totweet['Precipitaiton'] is not None and message is None:
+    if totweet['Precipitation'] is not None and message is None:
         message = f'\U0001F4A7 In the last 24h we had a considerable precipitation accumulation of {totweet["Precipitaiton"]}mm \U0001F4A7'
 
     return message
