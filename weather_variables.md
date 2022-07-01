@@ -5,7 +5,7 @@ check out https://acinn-data.uibk.ac.at/innsbruck/1
 column 'time' is added in get_weather_data in get_data.py
 
 - rr
-  - rain? [mm?]
+  - rain rate [mm/h]
   - float64
   - invalid value: -599.xx
 - dd

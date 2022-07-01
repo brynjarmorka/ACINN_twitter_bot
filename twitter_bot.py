@@ -14,6 +14,7 @@ from pathlib import Path
 
 def update_twitter(config, message):
     """This actually updates twitter, if the config.ini have the valid keys.
+    
     Parameters
     ----------
     config : dict
@@ -84,8 +85,8 @@ def get_api_key():
 
 def detect_anomaly(weather, climate):
     """
-    Compares weather to the climate and makes a message.
-    If it cannot find any interesting data, it will return None.
+    Compares weather to the climate.
+    If it cannot find any interesting data, it will return Nones.
     Parameters
     ----------
     weather : pandas DataFrame
@@ -95,24 +96,84 @@ def detect_anomaly(weather, climate):
         The local monthly climate based on a static file. From the past _____ years.
     Returns
     -------
-    message : string or None
-        The message to be posted on twitter. If it's None, no tweet should be posted.
+    message : list with interesting data.
+        The data that is to be used then by the message generator.
     """
+    # Initialize output list
+    totweet = {'Temperature': None, 'Extreme': False,'Precipitation': None}
+    
+    # find todays month:
+    month = datetime.datetime.today().month
+    #time = str(datetime.datetime.now().hour) + ":" + str(datetime.datetime.now().minute)
 
-    # placeholder code:
-    month = datetime.datetime.now().month
-    time = str(datetime.datetime.now().hour) + ":" + str(datetime.datetime.now().minute)
+    # Climate
+    c = climate.iloc[climate.index == month]
 
-    w = weather["tl"].mean()
-    c = climate["mean"][month]
-    dif = round(w - c, 1)
+    # Temperature
+    wtemp = weather.tl.mean()
+    
+    ## Exceptional event?
+    if wtemp > float(c.p95) or wtemp < float(c.p05):
+        # we have an anomalous temperature! 
+        dif = round(wtemp - float(c['mean']), 1)
+        totweet['Temperature'] = [round(wtemp, 1), dif]
+    ## Never-before event?
+    if wtemp > float(c['max']) or wtemp < float(c['min']):
+        # we have an extreme temperature! 
+        totweet['extreme'] = True
+    
+    # Precipitation
+    wppt = weather.rr.sum()/6 # ppt intensity each 10 minutes, translated to actual ppt.
+    if wppt > 5: # 5mm/24 h threshold
+        totweet['Precipitaiton'] = str(round(wppt, 1))
 
-    if dif > 0:
-        dif = "+" + str(dif)
-    w = round(w, 1)
-    message = f"Last 24h mean temperature ({time}) is {w} deg. and differs from monthly climate values by {dif} deg."
+    return totweet
+
+def text_generator(totweet):
+    """
+    Function that generates the message that is going to be tweeted.
+
+    Parameters
+    ----------
+    totweet : dictionary
+        dictionary with the keys: 'Temperature' [temperature, anomaly] 
+        [float or None, float or None],, 'Extreme' bool, 'Precipitaiton': float or None.
+
+    Returns
+    -------
+    Message (s) to be tweeted.
+
+    """
+    message = None
+    # check temperature
+    if totweet['Temperature'] is not None:
+        if totweet['Temperature'] > 0 and totweet['Extreme']:
+            emoji = '\U0000203C\U0001F975\U0001F975\U0000203C'
+            txt = 'an extreme'
+        
+        if totweet['Temperature'] > 0 and not totweet['Extreme']:
+            emoji = '\U0001F975'
+            txt = 'an important'
+            
+        if totweet['Temperature'] < 0 and totweet['Extreme']:
+            emoji = '\U0000203C\U0001F976\U0001F976\U0000203C'
+            txt = 'an extreme'
+            
+        if totweet['Temperature'] < 0 and not totweet['Extreme']:
+            emoji = '\U0001F976'
+            txt = 'an important'
+            
+        message = f'{emoji} In the last 24h we had {txt} anomalous temperature of {totweet["Temperature"][0]}ºC, {totweet["Temperature"][1]}ºC away from the monthly mean. {emoji}'
+        
+    # check precipitation
+    # add ppt message
+    if totweet['Precipitaiton'] is not None and message is not None:
+        message = message + f'\n \U0001F4A7 And and a considerable precipitation accumulation of {totweet["Precipitation"]}mm \U0001F4A7'
+    # create ppt message
+    if totweet['Precipitaiton'] is not None and message is None:
+        message = f'\U0001F4A7 In the last 24h we had a considerable precipitation accumulation of {totweet["Precipitaiton"]}mm \U0001F4A7'
+
     return message
-
 
 def main():
     """Runs weather and climate comparison, makes a message and post to twitter."""
@@ -120,15 +181,19 @@ def main():
     config = get_api_key()
     climate = get_climate_data(station)
     weather = get_weather_data(station)
-    message = detect_anomaly(weather, climate)
+    totweet = detect_anomaly(weather, climate)
+    message = text_generator(totweet)
 
     if message is not None:
         # TODO: remove the dummy_ for actually posting to Twitter:
-        update_twitter(config, message)
+        #update_twitter(config, message)
+        dummy_update_twitter(config, message)
 
 
 if __name__ == "__main__":
-    """Scheduler, i.e. running main() in an interval"""
+    """When run from terminal all the workflow is lounched and if anomaly is 
+    found a tweet is produced.
+    """
     main()
-
+    
     sys.exit()
