@@ -37,4 +37,4 @@ Please use black to follow to PEP8
 
 # Data sources:
 - 10-min data from ACINN weather station. see data_license.txt for weather data from ACINN
-- Daily 2m temperature mean data from https://dataset.api.hub.zamg.ac.at/app/station-new/historical/klima-v1-1d?anonymous=true
+- Daily 2m temperature mean data from 01011990-01012020 https://dataset.api.hub.zamg.ac.at/app/station-new/historical/klima-v1-1d?anonymous=true
