@@ -147,19 +147,19 @@ def text_generator(totweet):
     message = None
     # check temperature
     if totweet['Temperature'] is not None:
-        if totweet['Temperature'] > 0 and totweet['Extreme']:
+        if totweet['Temperature'][1] > 0 and totweet['Extreme']:
             emoji = '\U0000203C\U0001F975\U0001F975\U0000203C'
             txt = 'an extreme'
         
-        if totweet['Temperature'] > 0 and not totweet['Extreme']:
+        if totweet['Temperature'][1] > 0 and not totweet['Extreme']:
             emoji = '\U0001F975'
             txt = 'an important'
             
-        if totweet['Temperature'] < 0 and totweet['Extreme']:
+        if totweet['Temperature'][1] < 0 and totweet['Extreme']:
             emoji = '\U0000203C\U0001F976\U0001F976\U0000203C'
             txt = 'an extreme'
             
-        if totweet['Temperature'] < 0 and not totweet['Extreme']:
+        if totweet['Temperature'][1] < 0 and not totweet['Extreme']:
             emoji = '\U0001F976'
             txt = 'an important'
             
