@@ -1,6 +1,10 @@
 This is a twitter bot for interesting weather events from ACINN. Forked from 
 https://github.com/stefanstoeckl/ACINN_twitter_bot.
 
+# The account looks like that:
+
+![](twitter_profile.png)
+
 # Usage:
 - add twitter credentials (requires developer account and a created twitter app) to a file called "config.ini" 
 - run "twitter_bot.py".
