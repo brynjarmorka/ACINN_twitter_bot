@@ -8,10 +8,7 @@ https://github.com/stefanstoeckl/ACINN_twitter_bot.
 # And it can be embeded like this:
 
 
-<html>
-	<iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" allowfullscreen="true" class="twitter-timeline twitter-timeline-rendered" 		style="position: static; visibility: visible; display: inline-block; width: 100%; padding: 0px; border: none; max-width: 100%; min-width: 180px; margin-top: 0px; 	margin-bottom: 0px; min-height: 200px; height: 3485.89px;" data-widget-id="profile:ProgAdv" title="Twitter Timeline">	
-	</iframe>
-</html>
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">💧 In the last 24h we had a considerable precipitation accumulation of 9.3mm 💧</p>&mdash; ACINN Wetterbot (@ProgAdv) <a href="https://twitter.com/ProgAdv/status/1542880672074928128?ref_src=twsrc%5Etfw">July 1, 2022</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 
 # Usage:
