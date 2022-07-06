@@ -6,7 +6,9 @@ https://github.com/stefanstoeckl/ACINN_twitter_bot.
 ![](twitter_profile.png)
 
 # And it can be embeded like this:
+<img>
 <a class="twitter-timeline" href="https://twitter.com/ProgAdv?ref_src=twsrc%5Etfw">Tweets by ProgAdv</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</img>
 
 # Usage:
 - add twitter credentials (requires developer account and a created twitter app) to a file called "config.ini" 
